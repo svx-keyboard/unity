@@ -100,10 +100,6 @@ public class RobotDrive : MonoBehaviour
 
         Vector3 forward = Quaternion.Euler(0f, modelForwardOffset, 0f) * transform.forward;
 
-
-        Debug.Log($"ForwardSpeed = {forwardSpeed}");
-
-
         rb.linearVelocity = forward * forwardSpeed;
 
         rb.angularVelocity = Vector3.up * angularSpeed * Mathf.Deg2Rad;
