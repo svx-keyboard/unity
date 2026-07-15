@@ -21,6 +21,12 @@ public class JointController : MonoBehaviour
     public LayerMask forbiddenLayers;
     public Collider[] forbiddenColliders;
 
+    [Header("Gripper")]
+    public bool maxAngleIsClosed = false;
+    public bool IsClosed { get; private set; }
+    public float tolerance = 10f;
+
+
     float currentAngle;
 
     void Start()
@@ -60,6 +66,12 @@ public class JointController : MonoBehaviour
             currentAngle = oldAngle;
             ApplyRotation(currentAngle);
         }
+
+
+        if (maxAngleIsClosed)
+            IsClosed = Mathf.Abs(currentAngle - maxAngle) < tolerance;
+        else
+            IsClosed = Mathf.Abs(currentAngle - minAngle) < tolerance;
     }
 
     void ApplyRotation(float angle)
