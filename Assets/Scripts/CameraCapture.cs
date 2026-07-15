@@ -10,7 +10,7 @@ public class CameraCapture : MonoBehaviour
 
     void Awake()
     {
-        robotCamera = GameObject.Find("Camera").GetComponent<Camera>();
+        robotCamera = GameObject.Find("CameraScript").GetComponent<Camera>();
     }
 
     void Update()
