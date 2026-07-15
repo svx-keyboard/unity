@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class JointController : MonoBehaviour
 {
+    private ArmCollisionChecker collisionChecker;
     public enum Axis
     {
         X,
@@ -35,6 +36,7 @@ public class JointController : MonoBehaviour
 
     void Start()
     {
+        collisionChecker = GetComponentInParent<ArmCollisionChecker>();
         Vector3 e = transform.localEulerAngles;
 
         switch (rotationAxis)
@@ -67,7 +69,8 @@ public class JointController : MonoBehaviour
 
         ApplyRotation(currentAngle);
 
-        if (HasCollision())
+        if (collisionChecker != null &&
+    collisionChecker.HasCollision())
         {
             currentAngle = oldAngle;
             ApplyRotation(currentAngle);
@@ -100,68 +103,7 @@ public class JointController : MonoBehaviour
 
     //-------------------------------------------------
 
-    bool HasCollision()
-    {
-        foreach (Collider own in ownColliders)
-        {
-            if (own == null)
-                continue;
-
-            //------------------------------
-            // Проверка против пальцев
-            //------------------------------
-
-            foreach (Collider other in forbiddenColliders)
-            {
-                if (other == null)
-                    continue;
-
-                Vector3 dir;
-                float dist;
-
-                if (Physics.ComputePenetration(
-                    own, own.transform.position, own.transform.rotation,
-                    other, other.transform.position, other.transform.rotation,
-                    out dir,
-                    out dist))
-                {
-                    return true;
-                }
-            }
-
-            //------------------------------
-            // Проверка против мира
-            //------------------------------
-
-            Collider[] hits =
-                Physics.OverlapBox(
-                    own.bounds.center,
-                    own.bounds.extents,
-                    own.transform.rotation,
-                    forbiddenLayers);
-
-            foreach (Collider hit in hits)
-            {
-                if (hit.transform.IsChildOf(transform.root))
-                    continue;
-
-                Vector3 dir;
-                float dist;
-
-                if (Physics.ComputePenetration(
-                    own, own.transform.position, own.transform.rotation,
-                    hit, hit.transform.position, hit.transform.rotation,
-                    out dir,
-                    out dist))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
+   
     //-------------------------------------------------
 
     float Normalize(float a)
