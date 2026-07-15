@@ -4,12 +4,7 @@ using UnityEngine;
 public class JointController : MonoBehaviour
 {
     private ArmCollisionChecker collisionChecker;
-    public enum Axis
-    {
-        X,
-        Y,
-        Z
-    }
+    public enum Axis {X, Y, Z}
 
     [Header("Rotation")]
     public Axis rotationAxis = Axis.Z;
@@ -22,14 +17,8 @@ public class JointController : MonoBehaviour
     public float speed = 90;
 
     [Header("Collision")]
-
-    // Все коллайдеры этого звена
     public Collider[] ownColliders;
-
-    // С какими слоями запрещено пересекаться
     public LayerMask forbiddenLayers;
-
-    // Коллайдеры другого пальца
     public Collider[] forbiddenColliders;
 
     float currentAngle;
@@ -44,18 +33,14 @@ public class JointController : MonoBehaviour
             case Axis.X:
                 currentAngle = Normalize(e.x);
                 break;
-
             case Axis.Y:
                 currentAngle = Normalize(e.y);
                 break;
-
             case Axis.Z:
                 currentAngle = Normalize(e.z);
                 break;
         }
     }
-
-    //-------------------------------------------------
 
     public void SetInput(float value)
     {
@@ -77,8 +62,6 @@ public class JointController : MonoBehaviour
         }
     }
 
-    //-------------------------------------------------
-
     void ApplyRotation(float angle)
     {
         Vector3 e = transform.localEulerAngles;
@@ -88,23 +71,15 @@ public class JointController : MonoBehaviour
             case Axis.X:
                 e.x = angle;
                 break;
-
             case Axis.Y:
                 e.y = angle;
                 break;
-
             case Axis.Z:
                 e.z = angle;
                 break;
         }
-
         transform.localEulerAngles = e;
     }
-
-    //-------------------------------------------------
-
-   
-    //-------------------------------------------------
 
     float Normalize(float a)
     {
