@@ -58,8 +58,8 @@ public class RobotBrain : Agent
     public override void Initialize()
     {
         rb = GetComponent<Rigidbody>();
-        drive = GetComponent<RobotDrive>();[cite: 13]
-        sensors = GetComponent<RobotSensors>();[cite: 14]
+        drive = GetComponent<RobotDrive>();
+        sensors = GetComponent<RobotSensors>();
 
         // Автоматический поиск компонентов, если они не привязаны вручную
         if (yoloCamera == null) yoloCamera = GetComponentInChildren<SimulatedYoloCamera>();
@@ -76,7 +76,7 @@ public class RobotBrain : Agent
 
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
-        drive.Stop();[cite: 13]
+        drive.Stop();
 
         actionQueue.Clear();
 
@@ -141,13 +141,13 @@ public class RobotBrain : Agent
     {
         UpdateYoloDropout();
 
-        bool isVisibleNow = yoloCamera != null && yoloCamera.IsTargetVisible && !isYoloFrozen;[cite: 20]
+        bool isVisibleNow = yoloCamera != null && yoloCamera.IsTargetVisible && !isYoloFrozen;
 
         if (isVisibleNow)
         {
             timeSinceLastDetection = 0.0f;
             // Вычисляем горизонтальное смещение от центра экрана [-0.5; 0.5] и переводим в [-1.0; 1.0]
-            lastKnownDirectionToBall = (yoloCamera.TargetScreenPos.x - 0.5f) * 2.0f;[cite: 20]
+            lastKnownDirectionToBall = (yoloCamera.TargetScreenPos.x - 0.5f) * 2.0f;
         }
         else
         {
@@ -161,18 +161,18 @@ public class RobotBrain : Agent
     public override void CollectObservations(VectorSensor sensor)
     {
         // Базовые флаги видимости
-        bool ballVisible = yoloCamera != null && yoloCamera.IsTargetVisible && !isYoloFrozen;[cite: 20]
+        bool ballVisible = yoloCamera != null && yoloCamera.IsTargetVisible && !isYoloFrozen;
 
         // 1. Нормализованное расстояние с УЗ-дальномера
-        float rawUltrasonic = sensors != null ? sensors.UltrasonicValue : 1.0f;[cite: 14]
+        float rawUltrasonic = sensors != null ? sensors.UltrasonicValue : 1.0f;
         sensor.AddObservation(Mathf.Clamp01(rawUltrasonic));
 
         // 2. Левый ИК-датчик препятствий (0/1)
-        float leftIR = (sensors != null && sensors.LeftIR > 0.5f) ? 1.0f : 0.0f;[cite: 14]
+        float leftIR = (sensors != null && sensors.LeftIR > 0.5f) ? 1.0f : 0.0f;
         sensor.AddObservation(leftIR);
 
         // 3. Правый ИК-датчик препятствий (0/1)
-        float rightIR = (sensors != null && sensors.RightIR > 0.5f) ? 1.0f : 0.0f;[cite: 14]
+        float rightIR = (sensors != null && sensors.RightIR > 0.5f) ? 1.0f : 0.0f;
         sensor.AddObservation(rightIR);
 
         // 4. ИК-датчик клешни (0/1)
@@ -183,7 +183,7 @@ public class RobotBrain : Agent
         float currentHorizontalAngle = 0.0f;
         if (ballVisible)
         {
-            currentHorizontalAngle = (yoloCamera.TargetScreenPos.x - 0.5f) * 2.0f;[cite: 20]
+            currentHorizontalAngle = (yoloCamera.TargetScreenPos.x - 0.5f) * 2.0f;
         }
         sensor.AddObservation(currentHorizontalAngle);
 
@@ -191,8 +191,8 @@ public class RobotBrain : Agent
         float normalizedDistanceToBall = 1.0f;
         if (ballVisible)
         {
-            float rawDist = Vector3.Distance(yoloCamera.robotCamera.transform.position, yoloCamera.target.position);[cite: 20]
-            normalizedDistanceToBall = Mathf.Clamp01(rawDist / yoloCamera.maxDetectionRange);[cite: 20]
+            float rawDist = Vector3.Distance(yoloCamera.robotCamera.transform.position, yoloCamera.target.position);
+            normalizedDistanceToBall = Mathf.Clamp01(rawDist / yoloCamera.maxDetectionRange);
         }
         sensor.AddObservation(normalizedDistanceToBall);
 
@@ -210,11 +210,11 @@ public class RobotBrain : Agent
         sensor.AddObservation(holding ? 1.0f : 0.0f);
 
         // 11. Относительное смещение робота по оси X от точки старта (из RobotPositionTracker.cs)
-        float relX = positionTracker != null ? positionTracker.RelativeX : 0.0f;[cite: 19]
+        float relX = positionTracker != null ? positionTracker.RelativeX : 0.0f;
         sensor.AddObservation(relX);
 
         // 12. Относительное смещение робота по оси Z от точки старта (из RobotPositionTracker.cs)
-        float relZ = positionTracker != null ? positionTracker.RelativeZ : 0.0f;[cite: 19]
+        float relZ = positionTracker != null ? positionTracker.RelativeZ : 0.0f;
         sensor.AddObservation(relZ);
 
         // 13. Нормализованный угол направления взгляда робота (Heading) [-1.0; 1.0]
@@ -227,8 +227,6 @@ public class RobotBrain : Agent
 
         // 15. Время, прошедшее с момента последней детекции мяча
         sensor.AddObservation(timeSinceLastDetection);
-
-        // ИТОГО: Ровно 15 значений параметров (Vector Observation Space Size = 15)
     }
 
     // =================================================================================
@@ -247,7 +245,7 @@ public class RobotBrain : Agent
         actionQueue.Enqueue(currentActionFrame);
         if (actionQueue.Count < wifiDelaySteps)
         {
-            drive.Stop();[cite: 13]
+            drive.Stop();
             return;
         }
 
@@ -259,12 +257,12 @@ public class RobotBrain : Agent
         float camInput = delayedAction[2]; // continuous[2] -> поворот камеры
 
         // Передаем движение гусеничной платформе (в TrackController / RobotDrive)
-        drive.Drive(gas, steer);[cite: 13]
+        drive.Drive(gas, steer);
 
         // Передаем сигнал поворота сервоприводу камеры
         if (cameraServoJoint != null)
         {
-            cameraServoJoint.SetInput(camInput);[cite: 12]
+            cameraServoJoint.SetInput(camInput);
         }
 
         // Чтение сигнала дискретного действия (discrete[0] -> команда клешне)
@@ -275,13 +273,12 @@ public class RobotBrain : Agent
             switch (clawCommand)
             {
                 case 0: // Стоять / Ничего не делать
-                    // Оставляем текущее состояние входа без изменений или сбрасываем в 0
                     break;
                 case 1: // Закрыть клешню
-                    gripperJoint.SetInput(1.0f);[cite: 12]
+                    gripperJoint.SetInput(1.0f);
                     break;
                 case 2: // Открыть клешню
-                    gripperJoint.SetInput(-1.0f);[cite: 12]
+                    gripperJoint.SetInput(-1.0f);
                     break;
             }
         }
@@ -292,15 +289,10 @@ public class RobotBrain : Agent
         CalculateNominalRewards();
     }
 
-    /// <summary>
-    /// Временный номинальный расчет наград для базового тестирования архитектуры.
-    /// </summary>
     private void CalculateNominalRewards()
     {
-        // Минимальный номинальный штраф за время, чтобы ИИ не засыпал
         AddReward(-0.0005f);
 
-        // Номинальный успех: если сработал триггер физического удержания мяча клешней
         if (holding)
         {
             SetReward(1.0f);
@@ -392,16 +384,14 @@ public class RobotBrain : Agent
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
-        // Непрерывные действия
         var continuousActions = actionsOut.ContinuousActions;
-        continuousActions[0] = Input.GetAxis("Vertical");   // Линейное движение
-        continuousActions[1] = Input.GetAxis("Horizontal"); // Вращение Платформы
-        continuousActions[2] = Input.GetKey(KeyCode.C) ? 1.0f : (Input.GetKey(KeyCode.X) ? -1.0f : 0.0f); // Мышь / кнопки для сервы
+        continuousActions[0] = Input.GetAxis("Vertical");   
+        continuousActions[1] = Input.GetAxis("Horizontal"); 
+        continuousActions[2] = Input.GetKey(KeyCode.C) ? 1.0f : (Input.GetKey(KeyCode.X) ? -1.0f : 0.0f); 
 
-        // Дискретные действия
         var discreteActions = actionsOut.DiscreteActions;
-        if (Input.GetKey(KeyCode.Alpha1)) discreteActions[0] = 1;      // Закрыть клешню
-        else if (Input.GetKey(KeyCode.Alpha2)) discreteActions[0] = 2; // Открыть клешню
-        else discreteActions[0] = 0;                                   // Стоять
+        if (Input.GetKey(KeyCode.Alpha1)) discreteActions[0] = 1;      
+        else if (Input.GetKey(KeyCode.Alpha2)) discreteActions[0] = 2; 
+        else discreteActions[0] = 0;                                   
     }
 }
